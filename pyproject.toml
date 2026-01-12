@@ -1,0 +1,391 @@
+[project]
+name = "app"
+version = "0.1.0"
+description = "Add your description here"
+authors = [{ name = "Emmanuel Okoye", email = "emmanuel@genta.dev" }]
+requires-python = ">=3.13,<3.14"
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development",
+    "Typing :: Typed",
+]
+dependencies = [
+    "advanced-alchemy[uuid,obstore]",
+    "psycopg[pool,binary]",
+    "python-dotenv",
+    "pwdlib[argon2]",
+    "httpx-oauth",
+    "fastapi>=0.115.8",
+    "uvicorn>=0.34.0",
+    "pydantic-settings>=2.7.1",
+    "pydantic>=2.10.6",
+    "email-validator>=2.2.0",
+    "loguru>=0.7.3",
+    "yarl>=1.18.3",
+    "ruff>=0.9.4",
+    "mypy>=1.15.0",
+    "sqlalchemy[asyncio]>=2.0.37",
+    "asyncpg>=0.30.0",
+    "pyjwt>=2.10.1",
+    "passlib>=1.7.4",
+    "alembic>=1.14.1",
+    "pytest>=8.3.4",
+    "pytest-env>=1.1.5",
+    "anyio>=4.9.0",
+    "httpx==0.28.1",
+    "factory-boy>=3.3.3",
+    "redis>=5.2.1",
+    "fakeredis>=2.28.1",
+    "aio-pika>=9.5.5",
+    "taskiq>=0.11.16",
+    "taskiq-aio-pika>=0.4.1",
+    "taskiq-redis>=1.0.4",
+    "taskiq-fastapi>=0.3.4",
+    "orjson>=3.10.16",
+    "prometheus-fastapi-instrumentator>=7.1.0",
+    "logfire[aio-pika,asyncpg,fastapi,httpx,sqlalchemy,system-metrics]>=3.16.0",
+    "python-slugify>=8.0.0",
+    "python-jose[cryptography]>=3.5.0",
+    "aiokafka",
+    "apiexception>=0.1.16",
+    "openpyxl>=3.1.2",
+    "pandas>=2.2.0",
+    "boxsdk>=3.9.2",
+    "xlrd>=2.0.1",
+    "structlog>=24.1.0",
+]
+keywords = ["fastapi", "sqlalchemy", "alembic", "fullstack", "api", "asgi"]
+license = { text = "MIT" }
+readme = "README.md"
+
+[project.scripts]
+app = "app.__main__:run_cli"
+
+
+[dependency-groups]
+dev = [{ include-group = "linting" }, { include-group = "test" }]
+linting = [
+    "pre-commit>=3.4.0",
+    "mypy>=1.5.1",
+    "ruff>=0.0.287",
+    "slotscheck",
+    "types-click",
+    "types-passlib",
+    "types-pyyaml",
+    "pyright",
+]
+test = [
+    "bump-my-version",
+    "pytest",
+    "pytest-xdist",
+    "pytest-asyncio",
+    "pytest-mock",
+    "pytest-cov",
+    "coverage[toml]",
+    "pytest-sugar",
+    "pytest-databases[postgres]>=0.1.0",
+    "polyfactory",
+]
+
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling", "setuptools"]
+
+[tool.hatch.metadata]
+# direct dependency references, e.g `pip @ git+https://github.com/pypa/pip.git@master`
+allow-direct-references = true
+
+[tool.hatch.build]
+dev-mode-dirs = ["src", "."]
+ignore-vcs = true
+sources = ["src"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [".github", "docs"]
+include = ["src/*", "tests/*", "public/*", "tools/*", "resources", "LICENSE"]
+skip-excluded-dirs = false
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.bumpversion]
+allow_dirty = false
+commit = false
+commit_args = "--no-verify"
+current_version = "0.1.0"
+ignore_missing_files = false
+ignore_missing_version = false
+message = "Bump version: {current_version} → {new_version}"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+regex = false
+replace = "{new_version}"
+search = "{current_version}"
+serialize = ["{major}.{minor}.{patch}"]
+sign_tags = false
+tag = false
+tag_message = "Bump version: {current_version} → {new_version}"
+tag_name = "v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+replace = 'version = "{new_version}"'
+search = 'version = "{current_version}"'
+
+
+[tool.coverage.report]
+exclude_lines = [
+    'if TYPE_CHECKING:',
+    'pragma: no cover',
+    "if __name__ == .__main__.:",
+    'def __repr__',
+    'if self\.debug:',
+    'if settings\.DEBUG',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'if 0:',
+    'class .*\bProtocol\):',
+    '@(abc\.)?abstractmethod',
+]
+omit = ["*/tests/*"]
+show_missing = true
+
+[tool.coverage.run]
+branch = true
+concurrency = ["multiprocessing"]
+omit = ["tests/*", "**/*/migrations/**/*.py", "tools/*"]
+parallel = true
+relative_files = true
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src/app",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-report=xml",
+    "--cov-fail-under=90",
+    "--tb=short",
+    "-v",
+    "-ra",
+]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning:pkg_resources",
+    "ignore::DeprecationWarning:google.*",
+    "ignore::DeprecationWarning:passlib.*",
+    "ignore::DeprecationWarning:aiosql.*",
+    "ignore::DeprecationWarning:litestar.constants.*",
+    "ignore::DeprecationWarning:litestar.utils.*",
+    "ignore::DeprecationWarning:litestar.cli.*",
+    "ignore::DeprecationWarning:httpx._client",
+]
+markers = [
+    "unit: marks tests as unit tests (fast, isolated)",
+    "integration: marks tests as integration tests (slower, database)",
+    "slow: marks tests as slow running tests",
+    "auth: marks tests related to authentication",
+    "email: marks tests that send emails",
+    "external: marks tests that call external services",
+    "oauth: marks tests related to OAuth functionality",
+    "services: marks tests for service layer",
+    "models: marks tests for database models",
+    "endpoints: marks tests for API endpoints",
+    "security: marks tests for security features",
+    "teams: marks tests related to team functionality",
+]
+python_classes = ["Test*"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    '__pycache__',
+    "src/py/app/db/migrations/versions/*.py",
+]
+fix = true
+line-length = 120
+src = ["src", "tests/"]
+target-version = "py311"
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+ignore = [
+    "A003", # flake8-builtins - class attribute {name} is shadowing a python builtin
+    "A005", # flake8-builtins - module {name} shadows a Python standard-library module
+    "B010", # flake8-bugbear - do not call setattr with a constant attribute value
+    "D100", # pydocstyle - missing docstring in public module
+    "D101", # pydocstyle - missing docstring in public class
+    "D102", # pydocstyle - missing docstring in public method
+    "D103", # pydocstyle - missing docstring in public function
+    "D104", # pydocstyle - missing docstring in public package
+    "D105", # pydocstyle - missing docstring in magic method
+    "D106", # pydocstyle - missing docstring in public nested class
+    "D107", # pydocstyle - missing docstring in __init__
+    "D202", # pydocstyle - no blank lines allowed after function docstring
+    "D205", # pydocstyle - 1 blank line required between summary line and description
+    "D415", # pydocstyle - first line should end with a period, question mark, or exclamation point
+    "E501", # pydocstyle line too long, handled by black
+    "PLW2901", # pylint - for loop variable overwritten by assignment target
+    "RUF012", # Ruff-specific rule - annotated with classvar
+    "ANN401",
+    "FBT",
+    "PLR0913", # too many arguments
+    "PT",
+    "TD",
+    "ARG002", # ignore for now; investigate
+    "ARG003", # ignore for now; investigate
+    "PERF203", # ignore for now; investigate
+    "PD011", # pandas
+    "PLR0912",
+    "ISC001",
+    "COM812",
+    "CPY001",
+    "PGH003",
+    "FA100",
+    "PLC0415", # import should be at the top of the file
+    "PLR0904", # too many public methods
+    "PLR0917",
+    "PGH003",
+    "PLC2701",
+    "PLW3201",
+    "PLR6301",
+]
+select = ["ALL"]
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ['F401', 'D104']
+"docs/**/*.*" = ["S", "B", "DTZ", "A", "TC", "ERA", "D", "RET", "E731", "RUF012", "FA100", "ARG001"]
+"docs/conf.py" = ["FIX002", "ARG001", "INP001"]
+"*/migrations/*.py" = ['D104', 'D103', 'D205', 'D212']
+"src/app/db/migrations/versions/*.py" = ["ANN201", "INP001"]
+"src/app/db/models/*.py" = ["PLW0108"]
+"tests/*.py" = ['D103', 'S101', 'D104', "PLR2004", "RUF029", "ARG001", "SLF001", "DOC", "ANN", "S"]
+"tools/*.py" = ["INP001", "ERA001", "N999"]
+"tools/**/*.*" = ["D", "ARG", "EM", "TRY", "G", "FBT", "INP001", "S603", "S404", "PLR0915"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 16
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+    "classmethod",
+    "sqlalchemy.ext.declarative.declared_attr",
+    "sqlalchemy.orm.declared_attr.directive",
+    "sqlalchemy.orm.declared_attr",
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ['tests', 'app']
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Disallow all relative imports.
+ban-relative-imports = "all"
+
+[tool.slotscheck]
+strict-imports = false
+
+[tool.codespell]
+ignore-words-list = "alog,selectin,selectinload"
+skip = 'uv.lock, package-lock.json'
+
+[tool.mypy]
+disallow_any_generics = false
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_untyped_defs = true
+exclude = '''(?x)(
+^build/
+|^dist/
+|^.venv/
+|^node_modules/
+|^migrations/
+)
+'''
+implicit_reexport = false
+packages = ["app", "tests", "docs", "tools"]
+plugins = []
+python_version = "3.11"
+show_error_codes = true
+strict = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+disable_error_code = "attr-defined,type-var,union-attr"
+disallow_untyped_decorators = false
+module = ["tests.*"]
+warn_unused_ignores = false
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "sqlalchemy.*",
+    "saq.*",
+    "uvicorn.*",
+    "aiohttp.*",
+    "jsbeautifier",
+    "jsbeautifier.*",
+    "uvloop",
+    "uvloop.*",
+    "nodeenv",
+]
+
+[[tool.mypy.overrides]]
+ignore_errors = true
+module = ["app.db.migrations.*", "app.lib.dto.*"]
+
+
+[tool.pyright]
+disableBytesTypePromotions = true
+exclude = ["scripts", "docs", "src/app/db/migrations"]
+include = ["src/app", "tests"]
+pythonVersion = "3.13"
+reportMissingTypeStubs = false
+reportPrivateImportUsage = false
+reportUnknownMemberType = false
+reportUnnecessaryTypeIgnoreComments = true
+reportUnusedFunction = false
+strict = ["src/app/**/*"]
+venv = ".venv"
+venvPath = "."

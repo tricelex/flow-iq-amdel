@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.log
+*.sqlite3
+
+# Virtual env
+.venv/
+env/
+ENV/
+
+# PyCharm
+.idea/
+
+# uv lock cache (if using uv local cache or temp)
+.uv/
+
+# OS files
+.DS_Store
+
+# alembic
+migrations/versions/
+
+# test artifacts
+.coverage
+htmlcov/
+pytest_cache/
+
+# compiled files
+*.so
+*.pyd
+.idea/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
