@@ -63,6 +63,8 @@ dependencies = [
     "boxsdk>=3.9.2",
     "xlrd>=2.0.1",
     "structlog>=24.1.0",
+    "openai-agents>=0.6.5",
+    "aioodbc>=0.5.0",
 ]
 keywords = ["fastapi", "sqlalchemy", "alembic", "fullstack", "api", "asgi"]
 license = { text = "MIT" }

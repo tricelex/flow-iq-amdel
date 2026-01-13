@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.api.middleware import add_middleware
 from app.api.routes import health
+from app.api.routes.chat import message_router
 from app.core.logging import get_logger
 from app.core.settings import get_settings
 from app.db.base import alchemy
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
     add_middleware(app)
 
     app.include_router(health.router, prefix="/api/v1", tags=["health"])
+    app.include_router(message_router, prefix="/api/v1", tags=["chat"])
 
     return app
 

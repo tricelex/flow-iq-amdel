@@ -42,13 +42,21 @@ class Settings(BaseSettings):
     PORT: int = 8000
     ALLOWED_HOSTS: list[str] = ["http://localhost:8000", "http://localhost:3000"]
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/app"
+    #DATABASE_URL: str = "mssql+aioodbc://user:password@server.database.windows.net:1433/database"
+    DB_DRIVER: str = "ODBC+Driver+18+for+SQL+Server"
+    DB_PORT: int = 1433
+    DB_DATABASE: str = "database"
+    DB_USER: str = "user"
+    DB_PASSWORD: str = "password"
+    DB_SERVER: str = "server.database.windows.net"
 
     LOG_LEVEL: str = "INFO"
 
     # Observability
     prometheus: PrometheusSettings = PrometheusSettings()
     logfire: LogfireSettings = LogfireSettings()
+
+    OPENAI_API_KEY: str = "sk-proj-1234567890"
 
     @property
     def host(self) -> str:
