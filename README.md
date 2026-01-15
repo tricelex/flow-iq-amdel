@@ -13,8 +13,8 @@ A clean FastAPI application template ready for your implementation.
 ## Features
 
 - **FastAPI Backend:** Async API with automatic OpenAPI documentation
-- **Advanced Alchemy:** Database management with UUIDAuditBase models
-- **PostgreSQL:** Robust database storage with asyncpg
+- **Advanced Alchemy:** Database management with app-owned schema/prefix isolation
+- **Azure SQL Server:** Async access via ODBC driver and aioodbc
 - **Structured Logging:** Structlog for development and production
 - **Observability:** Prometheus metrics and Logfire integration (optional)
 - **Taskiq Integration:** Background task processing with taskiq (ready for your tasks)
@@ -86,11 +86,16 @@ Configure the following environment variables in `.env`:
 - `PORT`: API server port (default: 8000)
 - `ALLOWED_HOSTS`: Comma-separated list of allowed hosts
 
-**Database:**
+**Database (Azure SQL Server):**
 
-- `DATABASE_URL`: PostgreSQL connection string
-  - Format: `postgresql+asyncpg://user:password@host:port/dbname`
-  - Default: `postgresql+asyncpg://postgres:postgres@localhost:5432/app`
+- `DB_DRIVER`: ODBC driver name (default: `ODBC+Driver+18+for+SQL+Server`)
+- `DB_SERVER`: SQL Server host
+- `DB_PORT`: SQL Server port (default: 1433)
+- `DB_DATABASE`: Database name
+- `DB_USER`: Database user
+- `DB_PASSWORD`: Database password
+- `DB_SCHEMA`: Schema for app-owned tables (default: `app`)
+- `DB_TABLE_PREFIX`: Prefix for app-owned tables (default: `app_`)
 
 **Logging:**
 
@@ -129,6 +134,26 @@ Interactive API docs: `http://localhost:8000/docs`
 
 - `GET /api/v1/health` - Service health status
 - `GET /api/v1/health/db` - Database connectivity check
+
+### Async DB Usage Example
+
+```python
+from fastapi import APIRouter
+from sqlalchemy import text
+
+from app.api.deps import DatabaseSession
+router = APIRouter()
+
+
+@router.get("/example/db-status")
+async def db_status(session: DatabaseSession) -> dict[str, str]:
+    assert session is not None, "session must be provided"
+    assert hasattr(session, "execute"), "session must support execute"
+    result = await session.execute(text("SELECT 1"))
+    scalar = result.scalar_one()
+    status = "ok" if scalar == 1 else "unexpected"
+    return {"status": status}
+```
 
 ## Getting Started
 

@@ -1,3 +1,6 @@
-"""Database models."""
+"""Database models.
 
-# Add your models here
+Use AppBase from app.db.model_base to ensure tables use the app schema/prefix.
+"""
+
+# Add your models here (inherit from AppBase in app.db.model_base)

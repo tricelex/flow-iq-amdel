@@ -1,5 +1,4 @@
 from contextlib import asynccontextmanager
-from urllib.parse import quote_plus
 
 from advanced_alchemy.extensions.fastapi import (
     AdvancedAlchemy,
@@ -13,38 +12,22 @@ from app.core.settings import get_settings
 settings = get_settings()
 
 
-def build_azure_connection_string() -> str:
-    """Build Azure SQL Database connection string with ODBC driver.
+def get_database_url() -> str:
+    """Purpose: Provide the SQLAlchemy database URL from settings.
 
-    Constructs the connection string from individual database settings fields.
-    Format: mssql+aioodbc://user:password@server:port/database?driver=...&Encrypt=yes&...
+    Inputs: Settings instance (cached).
+    Returns: Database URL string for AdvancedAlchemy.
+    Preconditions: Settings must be initialized.
+    Postconditions: URL is non-empty.
+    Side effects: None.
     """
-    # URL encode user and password to handle special characters
-    user = quote_plus(settings.DB_USER)
-    password = quote_plus(settings.DB_PASSWORD)
-
-    # Build the base connection URL
-    base_url = f"mssql+aioodbc://{user}:{password}@{settings.DB_SERVER}:{settings.DB_PORT}/{settings.DB_DATABASE}"
-
-    # Build query parameters
-    driver_param = f"driver={quote_plus(settings.DB_DRIVER)}"
-
-    # Add additional Azure-specific connection parameters
-    azure_params = [
-        ("Encrypt", "yes"),
-        ("TrustServerCertificate", "no"),
-        ("Connection Timeout", "30"),
-    ]
-
-    param_parts = [driver_param]
-    for key, value in azure_params:
-        param_parts.append(f"{quote_plus(key)}={quote_plus(value)}")
-
-    return f"{base_url}?{'&'.join(param_parts)}"
+    assert settings is not None, "settings must be initialized"
+    assert isinstance(settings.DATABASE_URL, str), "DATABASE_URL must be a string"
+    return settings.DATABASE_URL
 
 
 sqlalchemy_config = SQLAlchemyAsyncConfig(
-    connection_string=build_azure_connection_string(),
+    connection_string=get_database_url(),
     session_config=AsyncSessionConfig(expire_on_commit=False),
     create_all=False,
     commit_mode="autocommit",
@@ -56,7 +39,16 @@ alchemy = AdvancedAlchemy(config=sqlalchemy_config)
 # 3. Define your helper context manager
 @asynccontextmanager
 async def async_session_context():
-    """Generator function to provide async database sessions for non-FastAPI contexts."""
+    """Purpose: Provide async DB sessions for non-FastAPI contexts.
+
+    Inputs: None.
+    Returns: AsyncSession context manager.
+    Preconditions: AdvancedAlchemy is configured.
+    Postconditions: Session is yielded and closed properly.
+    Side effects: Opens and closes a DB session.
+    """
+    assert alchemy is not None, "alchemy must be initialized"
+    assert settings is not None, "settings must be initialized"
     async with alchemy.with_async_session() as session:
         yield session
 
@@ -86,9 +78,16 @@ async_session_maker = alchemy.get_async_config().create_session_maker()
 
 
 def get_db_async_session() -> AsyncSession:
-    """Generator function to provide async database sessions for non-FastAPI contexts.
-    Use this in services, tools, and other non-endpoint code.
+    """Purpose: Create an AsyncSession for non-FastAPI contexts.
+
+    Inputs: None.
+    Returns: AsyncSession instance.
+    Preconditions: AdvancedAlchemy config must exist.
+    Postconditions: AsyncSession is created.
+    Side effects: Allocates a session object.
     """
+    assert alchemy is not None, "alchemy must be initialized"
+    assert settings is not None, "settings must be initialized"
     cfg = alchemy.get_async_config()
     AsyncSessionMaker = cfg.create_session_maker()
     return AsyncSessionMaker()

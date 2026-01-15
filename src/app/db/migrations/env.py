@@ -1,13 +1,13 @@
 import asyncio
 from logging.config import fileConfig
 
-from advanced_alchemy.base import UUIDAuditBase
 from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.core.settings import get_settings
+from app.db.model_base import AppBase
 
 config = context.config
 
@@ -17,7 +17,7 @@ if config.config_file_name is not None:
 settings = get_settings()
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
-target_metadata = UUIDAuditBase.metadata
+target_metadata = AppBase.metadata
 
 
 def run_migrations_offline() -> None:
@@ -33,11 +33,15 @@ def run_migrations_offline() -> None:
 
     """
     url = config.get_main_option("sqlalchemy.url")
+    assert url is not None, "sqlalchemy.url must be set"
+    assert isinstance(url, str), "sqlalchemy.url must be a string"
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=True,
+        version_table_schema=settings.DB_SCHEMA,
     )
 
     with context.begin_transaction():
@@ -45,13 +49,38 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    """Purpose: Configure Alembic context and run migrations.
+
+    Inputs: SQLAlchemy Connection.
+    Returns: None.
+    Preconditions: connection and metadata are valid.
+    Postconditions: Migrations executed in a transaction.
+    Side effects: Alters database schema.
+    """
+    assert connection is not None, "connection must be provided"
+    assert target_metadata is not None, "target_metadata must be set"
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        include_schemas=True,
+        version_table_schema=settings.DB_SCHEMA,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
 
 
 async def run_async_migrations() -> None:
+    """Purpose: Run migrations using an async engine.
+
+    Inputs: None.
+    Returns: None.
+    Preconditions: Alembic config is available.
+    Postconditions: Migrations are applied.
+    Side effects: Alters database schema.
+    """
+    assert config.config_ini_section != "", "config_ini_section must not be empty"
+    assert isinstance(settings.DB_SCHEMA, str), "DB_SCHEMA must be a string"
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
@@ -65,6 +94,16 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
+    """Purpose: Run migrations in online mode.
+
+    Inputs: None.
+    Returns: None.
+    Preconditions: DB settings are valid.
+    Postconditions: Async migrations executed.
+    Side effects: Alters database schema.
+    """
+    assert settings.DB_SCHEMA != "", "DB_SCHEMA must not be empty"
+    assert isinstance(settings.DATABASE_URL, str), "DATABASE_URL must be a string"
     asyncio.run(run_async_migrations())
 
 
