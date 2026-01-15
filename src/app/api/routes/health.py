@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import APIRouter
 from sqlalchemy import text
 
@@ -9,7 +11,7 @@ settings = get_settings()
 
 
 @router.get("/health")
-async def health_check():
+async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
@@ -18,7 +20,7 @@ async def health_check():
 
 
 @router.get("/health/db")
-async def database_health_check(session: DatabaseSession):
+async def database_health_check(session: DatabaseSession) -> dict[str, Any]:
     try:
         result = await session.execute(text("SELECT 1"))
         result.scalar_one()

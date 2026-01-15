@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     ALLOWED_HOSTS: list[str] = ["http://localhost:8000", "http://localhost:3000"]
 
-    #DATABASE_URL: str = "mssql+aioodbc://user:password@server.database.windows.net:1433/database"
+    # DATABASE_URL: str = "mssql+aioodbc://user:password@server.database.windows.net:1433/database"
     DB_DRIVER: str = "ODBC+Driver+18+for+SQL+Server"
     DB_PORT: int = 1433
     DB_DATABASE: str = "database"

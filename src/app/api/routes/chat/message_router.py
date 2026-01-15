@@ -1,13 +1,16 @@
-from fastapi import APIRouter, File, Depends, UploadFile
-from fastapi.responses import StreamingResponse
-from app.services.misc_services import form_as_model, format_sse
-from app.domain.entities import ChatMessageDTO
 import logging
+
+from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi.responses import StreamingResponse
+
+from app.domain.entities import ChatMessageDTO
 from app.infra.flow_iq_agent import FlowIQAgent
+from app.services.misc_services import form_as_model, format_sse
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
 
 @router.post("/chat")
 async def chat(
@@ -26,5 +29,5 @@ async def chat(
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
-        }
+        },
     )

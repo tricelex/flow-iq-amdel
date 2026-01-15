@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from urllib.parse import quote_plus
 
 from advanced_alchemy.extensions.fastapi import (
@@ -7,40 +8,38 @@ from advanced_alchemy.extensions.fastapi import (
 )
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from app.core.settings import get_settings
-from contextlib import asynccontextmanager
 
 settings = get_settings()
 
 
 def build_azure_connection_string() -> str:
     """Build Azure SQL Database connection string with ODBC driver.
-    
+
     Constructs the connection string from individual database settings fields.
     Format: mssql+aioodbc://user:password@server:port/database?driver=...&Encrypt=yes&...
     """
     # URL encode user and password to handle special characters
     user = quote_plus(settings.DB_USER)
     password = quote_plus(settings.DB_PASSWORD)
-    
+
     # Build the base connection URL
     base_url = f"mssql+aioodbc://{user}:{password}@{settings.DB_SERVER}:{settings.DB_PORT}/{settings.DB_DATABASE}"
-    
+
     # Build query parameters
     driver_param = f"driver={quote_plus(settings.DB_DRIVER)}"
-    
+
     # Add additional Azure-specific connection parameters
     azure_params = [
         ("Encrypt", "yes"),
         ("TrustServerCertificate", "no"),
         ("Connection Timeout", "30"),
     ]
-    
+
     param_parts = [driver_param]
     for key, value in azure_params:
         param_parts.append(f"{quote_plus(key)}={quote_plus(value)}")
-    
+
     return f"{base_url}?{'&'.join(param_parts)}"
 
 
@@ -54,14 +53,10 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
 alchemy = AdvancedAlchemy(config=sqlalchemy_config)
 
 
-
-
 # 3. Define your helper context manager
 @asynccontextmanager
 async def async_session_context():
-    """
-    Generator function to provide async database sessions for non-FastAPI contexts.
-    """
+    """Generator function to provide async database sessions for non-FastAPI contexts."""
     async with alchemy.with_async_session() as session:
         yield session
 
