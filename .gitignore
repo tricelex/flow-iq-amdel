@@ -39,3 +39,5 @@ __pycache__/
 *.pyd
 *.swp
 *.swo
+.cubestore
+coverage.xml

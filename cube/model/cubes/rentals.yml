@@ -1,0 +1,58 @@
+cubes:
+  - name: rentals
+    sql_table: rental
+    title: Rentals
+    description: DVD rental transactions
+
+    joins:
+      - name: customers
+        sql: "{CUBE}.customer_id = {customers.customer_id}"
+        relationship: many_to_one
+
+    dimensions:
+      - name: rental_id
+        sql: "{CUBE}.rental_id"
+        type: number
+        primary_key: true
+
+      - name: rental_date
+        sql: "{CUBE}.rental_date"
+        type: time
+        title: Rental Date
+
+      - name: return_date
+        sql: "{CUBE}.return_date"
+        type: time
+        title: Return Date
+
+      - name: is_returned
+        sql: "CASE WHEN {CUBE}.return_date IS NOT NULL THEN 'Yes' ELSE 'No' END"
+        type: string
+        title: Returned
+
+      - name: rental_duration_days
+        sql: "EXTRACT(DAY FROM ({CUBE}.return_date - {CUBE}.rental_date))"
+        type: number
+        title: Rental Duration (Days)
+
+    measures:
+      - name: count
+        type: count
+        title: Total Rentals
+
+      - name: returned_count
+        type: count
+        title: Returned Rentals
+        filters:
+          - sql: "{CUBE}.return_date IS NOT NULL"
+
+      - name: outstanding_count
+        type: count
+        title: Outstanding Rentals
+        filters:
+          - sql: "{CUBE}.return_date IS NULL"
+
+      - name: average_duration
+        sql: "EXTRACT(DAY FROM ({CUBE}.return_date - {CUBE}.rental_date))"
+        type: avg
+        title: Average Rental Duration (Days)

@@ -165,7 +165,7 @@ show_missing = true
 [tool.coverage.run]
 branch = true
 concurrency = ["multiprocessing"]
-omit = ["tests/*", "**/*/migrations/**/*.py", "tools/*"]
+omit = ["tests/*", "**/*/migrations/**/*.py", "tools/*", "scripts/*"]
 parallel = true
 relative_files = true
 

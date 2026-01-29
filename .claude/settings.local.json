@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker-compose logs:*)",
+      "Bash(docker-compose restart:*)",
+      "Bash(curl:*)",
+      "Bash(docker exec:*)",
+      "Bash(grep:*)",
+      "Bash(python scripts/test_cube.py:*)",
+      "Bash(docker-compose stop:*)",
+      "Bash(psql:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(python scripts/test_cube_client.py:*)",
+      "Bash(python scripts/test_analytics_tools.py:*)",
+      "Bash(python:*)",
+      "Bash(pytest:*)",
+      "Bash(head:*)"
+    ]
+  }
+}

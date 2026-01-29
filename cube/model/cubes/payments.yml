@@ -1,0 +1,55 @@
+cubes:
+  - name: payments
+    sql_table: payment
+    title: Payments
+    description: Payment transactions and revenue
+
+    joins:
+      - name: customers
+        sql: "{CUBE}.customer_id = {customers.customer_id}"
+        relationship: many_to_one
+
+      - name: rentals
+        sql: "{CUBE}.rental_id = {rentals.rental_id}"
+        relationship: many_to_one
+
+    dimensions:
+      - name: payment_id
+        sql: "{CUBE}.payment_id"
+        type: number
+        primary_key: true
+
+      - name: payment_date
+        sql: "{CUBE}.payment_date"
+        type: time
+        title: Payment Date
+
+      - name: amount
+        sql: "{CUBE}.amount"
+        type: number
+        title: Amount
+
+    measures:
+      - name: count
+        type: count
+        title: Total Payments
+
+      - name: total_revenue
+        sql: "{CUBE}.amount"
+        type: sum
+        title: Total Revenue
+
+      - name: average_payment
+        sql: "{CUBE}.amount"
+        type: avg
+        title: Average Payment Amount
+
+      - name: min_payment
+        sql: "{CUBE}.amount"
+        type: min
+        title: Minimum Payment
+
+      - name: max_payment
+        sql: "{CUBE}.amount"
+        type: max
+        title: Maximum Payment

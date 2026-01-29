@@ -69,7 +69,12 @@ class Settings(BaseSettings):
     prometheus: PrometheusSettings = PrometheusSettings()
     logfire: LogfireSettings = LogfireSettings()
 
+    # OpenAI Configuration
     OPENAI_API_KEY: str = "sk-proj-1234567890"
+
+    # Cube.js Configuration
+    CUBE_API_URL: str = "http://localhost:4000"
+    CUBE_API_SECRET: str = "flowiq-dev-secret-key"
 
     @property
     def host(self) -> str:

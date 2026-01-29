@@ -1,0 +1,12 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=PyCharm
+
+###
+
+# curl -H "Authorization: flowiq-dev-secret-key"
+#     http://localhost:4000/cubejs-api/v1/meta
+GET http://localhost:4000/cubejs-api/v1/meta
+Authorization: flowiq-dev-secret-key
+
+###
